@@ -314,9 +314,12 @@ void RSDK::Legacy::v4::LoadGameXML(bool pal)
 {
     FileInfo info;
     SortMods();
-    for (int32 m = 0; m < modList.size(); ++m) {
+
+    modObjCount = 0;
+
+    for (int32 m = modList.size() - 1; m >= 0; --m) {
         if (!modList[m].active)
-            break;
+            continue;
         SetActiveMod(m);
         InitFileInfo(&info);
         if (LoadFile(&info, "Data/Game/Game.xml", FMODE_RB)) {
@@ -464,8 +467,6 @@ void RSDK::Legacy::v4::LoadXMLPalettes(const tinyxml2::XMLElement *gameElement)
 
 void RSDK::Legacy::v4::LoadXMLObjects(const tinyxml2::XMLElement *gameElement)
 {
-    modObjCount = 0;
-
     const tinyxml2::XMLElement *objectsElement = gameElement->FirstChildElement("objects");
     if (objectsElement) {
         for (const tinyxml2::XMLElement *objElement = objectsElement->FirstChildElement("object"); objElement;

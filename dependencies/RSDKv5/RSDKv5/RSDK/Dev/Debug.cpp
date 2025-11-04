@@ -514,7 +514,6 @@ void RSDK::DevMenu_MainMenu()
             case 4: RenderDevice::isRunning = false; break;
 #else
             case 4:
-                LoadMods(true); // reload our mod list real quick
                 if (modList.size() != 0) {
                     devMenu.state     = DevMenu_ModsMenu;
                     devMenu.selection = 0;
