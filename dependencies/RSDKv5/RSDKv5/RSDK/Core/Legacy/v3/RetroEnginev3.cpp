@@ -507,7 +507,6 @@ void RSDK::Legacy::v3::RetroEngineCallback(int32 callbackID)
 #if RETRO_USE_MOD_LOADER
 void RSDK::Legacy::v3::LoadGameXML(bool pal)
 {
-    FileInfo info;
     SortMods();
 
     modObjCount = 0;
@@ -516,15 +515,17 @@ void RSDK::Legacy::v3::LoadGameXML(bool pal)
         if (!modList[m].active)
             continue;
         SetActiveMod(m);
-        InitFileInfo(&info);
-        if (LoadFile(&info, "Data/Game/Game.xml", FMODE_RB)) {
+
+        std::string path = modList[m].path + "/Data/Game/Game.xml";
+
+        FileIO *f = fOpen(path.c_str(), "rb");
+        if (f) {
+            uint32 fileSize          = fSize(f);
+            char *xmlData            = new char[fileSize + 1];
+            fRead(xmlData, 1, fileSize, f);
+            xmlData[fileSize] = 0;
+
             tinyxml2::XMLDocument *doc = new tinyxml2::XMLDocument;
-
-            char *xmlData = new char[info.fileSize + 1];
-            ReadBytes(&info, xmlData, info.fileSize);
-            xmlData[info.fileSize] = 0;
-            CloseFile(&info);
-
             doc->Parse(xmlData);
             const tinyxml2::XMLElement *gameElement = doc->FirstChildElement("game"); // gameElement is nullptr if parse failure
 
@@ -546,6 +547,8 @@ void RSDK::Legacy::v3::LoadGameXML(bool pal)
 
             delete[] xmlData;
             delete doc;
+
+            fClose(f);
         }
     }
     SetActiveMod(-1);
