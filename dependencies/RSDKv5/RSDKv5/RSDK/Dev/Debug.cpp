@@ -518,6 +518,9 @@ void RSDK::DevMenu_MainMenu()
                     devMenu.state     = DevMenu_ModsMenu;
                     devMenu.selection = 0;
                     devMenu.timer     = 1;
+#if RETRO_REV0U
+                    devMenu.legacyModMenuCleared = false;
+#endif
                 }
                 break;
 

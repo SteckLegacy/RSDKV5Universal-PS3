@@ -118,6 +118,7 @@ struct DevMenu {
     uint8 startingVersion;
 #if RETRO_REV0U
     int32 playerListPos;
+    bool32 legacyModMenuCleared;
 #endif
 #endif
 };

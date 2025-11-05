@@ -24,8 +24,10 @@ void RSDK::Legacy::v4::GetModName(int32 *textMenu, int32 *highlight, uint32 *id,
         return;
 
     TextMenu *menu = &gameMenu[*textMenu];
-    if (*id == 0)
+    if (*id == 0 && !devMenu.legacyModMenuCleared) {
         SetupTextMenu(menu, 0);
+        devMenu.legacyModMenuCleared = true;
+    }
     menu->entryHighlight[menu->rowCount] = *highlight;
     AddTextMenuEntry(menu, modList[*id].name.c_str());
 }
@@ -35,8 +37,10 @@ void RSDK::Legacy::v4::GetModDescription(int32 *textMenu, int32 *highlight, uint
         return;
 
     TextMenu *menu = &gameMenu[*textMenu];
-    if (*id == 0)
+    if (*id == 0 && !devMenu.legacyModMenuCleared) {
         SetupTextMenu(menu, 0);
+        devMenu.legacyModMenuCleared = true;
+    }
     menu->entryHighlight[menu->rowCount] = *highlight;
     AddTextMenuEntry(menu, modList[*id].description.c_str());
 }
@@ -46,8 +50,10 @@ void RSDK::Legacy::v4::GetModAuthor(int32 *textMenu, int32 *highlight, uint32 *i
         return;
 
     TextMenu *menu = &gameMenu[*textMenu];
-    if (*id == 0)
+    if (*id == 0 && !devMenu.legacyModMenuCleared) {
         SetupTextMenu(menu, 0);
+        devMenu.legacyModMenuCleared = true;
+    }
     menu->entryHighlight[menu->rowCount] = *highlight;
     AddTextMenuEntry(menu, modList[*id].author.c_str());
 }
@@ -57,8 +63,10 @@ void RSDK::Legacy::v4::GetModVersion(int32 *textMenu, int32 *highlight, uint32 *
         return;
 
     TextMenu *menu = &gameMenu[*textMenu];
-    if (*id == 0)
+    if (*id == 0 && !devMenu.legacyModMenuCleared) {
         SetupTextMenu(menu, 0);
+        devMenu.legacyModMenuCleared = true;
+    }
     menu->entryHighlight[menu->rowCount] = *highlight;
     AddTextMenuEntry(menu, modList[*id].version.c_str());
 }
