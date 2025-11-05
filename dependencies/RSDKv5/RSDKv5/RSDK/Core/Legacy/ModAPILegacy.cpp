@@ -76,6 +76,9 @@ void RSDK::Legacy::v4::SetModActive(uint32 *id, int32 *active)
         return;
 
     modList[*id].active = *active;
+
+    SaveMods();
+    ApplyModChanges();
 }
 void RSDK::Legacy::v4::MoveMod(uint32 *id, int32 *up)
 {
@@ -93,6 +96,9 @@ void RSDK::Legacy::v4::MoveMod(uint32 *id, int32 *up)
     ModInfo swap       = modList[preOption];
     modList[preOption] = modList[option];
     modList[option]    = swap;
+
+    SaveMods();
+    ApplyModChanges();
 }
 
 void RSDK::Legacy::v4::ExitGame() { RSDK::SKU::ExitGame(); }

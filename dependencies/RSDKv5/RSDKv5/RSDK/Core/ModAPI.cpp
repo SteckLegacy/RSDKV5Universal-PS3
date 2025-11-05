@@ -410,7 +410,7 @@ void RSDK::ApplyModChanges()
     uint32 category                      = sceneInfo.activeCategory;
     uint32 scene                         = sceneInfo.listPos;
     dataStorage[DATASET_SFX].usedStorage = 0;
-    RefreshModFolders(true);
+    RefreshModFolders(false);
     LoadModSettings();
     DetectEngineVersion();
     if (!engine.version)
