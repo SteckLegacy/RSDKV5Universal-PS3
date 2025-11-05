@@ -516,18 +516,15 @@ void RSDK::Legacy::v3::LoadGameXML(bool pal)
         if (!modList[m].active)
             continue;
         SetActiveMod(m);
-
-        std::string xmlPath = modList[m].path + "/Data/Game/Game.xml";
-        FileIO *f = fOpen(xmlPath.c_str(), "rb");
-
-        if (f) {
-            size_t size = fGetSize(f);
-            char *xmlData = new char[size + 1];
-            fRead(xmlData, 1, size, f);
-            xmlData[size] = 0;
-            fClose(f);
-
+        InitFileInfo(&info);
+        if (LoadFile(&info, "Data/Game/Game.xml", FMODE_RB)) {
             tinyxml2::XMLDocument *doc = new tinyxml2::XMLDocument;
+
+            char *xmlData = new char[info.fileSize + 1];
+            ReadBytes(&info, xmlData, info.fileSize);
+            xmlData[info.fileSize] = 0;
+            CloseFile(&info);
+
             doc->Parse(xmlData);
             const tinyxml2::XMLElement *gameElement = doc->FirstChildElement("game"); // gameElement is nullptr if parse failure
 
