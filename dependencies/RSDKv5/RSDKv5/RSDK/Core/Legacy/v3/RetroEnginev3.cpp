@@ -520,8 +520,10 @@ void RSDK::Legacy::v3::LoadGameXML(bool pal)
 
         FileIO *f = fOpen(path.c_str(), "rb");
         if (f) {
-            uint32 fileSize          = fSize(f);
-            char *xmlData            = new char[fileSize + 1];
+            fSeek(f, 0, SEEK_END);
+            uint32 fileSize = (uint32)fTell(f);
+            fSeek(f, 0, SEEK_SET);
+            char *xmlData = new char[fileSize + 1];
             fRead(xmlData, 1, fileSize, f);
             xmlData[fileSize] = 0;
 
