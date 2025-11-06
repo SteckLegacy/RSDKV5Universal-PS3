@@ -317,7 +317,7 @@ void RSDK::Legacy::v4::LoadGameXML(bool pal)
     if (!pal)
         modObjCount = 0;
 
-    for (int32 m = modList.size() - 1; m >= 0; --m) {
+    for (int32 m = 0; m < modList.size(); ++m) {
         if (!modList[m].active)
             continue;
 
