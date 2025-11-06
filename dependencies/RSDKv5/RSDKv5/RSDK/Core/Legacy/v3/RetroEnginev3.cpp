@@ -509,28 +509,35 @@ void RSDK::Legacy::v3::LoadGameXML(bool pal)
 {
     SortMods();
 
-    modObjCount = 0;
+    if (!pal)
+        modObjCount = 0;
 
     for (int32 m = modList.size() - 1; m >= 0; --m) {
         if (!modList[m].active)
             continue;
+
+        // Set active mod so the game knows what mod folder to look for files in
         SetActiveMod(m);
 
+        // Fun fact: if we use LoadFile here, it'll only load from the top-most mod
+        // so we have to do this Manually
+        // Oh boy I love reimplementing file loading
         std::string path = modList[m].path + "/Data/Game/Game.xml";
-
-        FileIO *f = fOpen(path.c_str(), "rb");
+        FileIO *f        = fOpen(path.c_str(), "rb");
         if (f) {
             fSeek(f, 0, SEEK_END);
             uint32 fileSize = (uint32)fTell(f);
             fSeek(f, 0, SEEK_SET);
-            char *xmlData = new char[fileSize + 1];
-            fRead(xmlData, 1, fileSize, f);
-            xmlData[fileSize] = 0;
+
+            char *fileBuffer = new char[fileSize + 1];
+            fRead(fileBuffer, 1, fileSize, f);
+            fileBuffer[fileSize] = 0;
+            fClose(f);
 
             tinyxml2::XMLDocument *doc = new tinyxml2::XMLDocument;
-            doc->Parse(xmlData);
-            const tinyxml2::XMLElement *gameElement = doc->FirstChildElement("game"); // gameElement is nullptr if parse failure
+            doc->Parse(fileBuffer);
 
+            const tinyxml2::XMLElement *gameElement = doc->FirstChildElement("game");
             if (gameElement) {
                 if (pal)
                     LoadXMLPalettes(gameElement);
@@ -547,12 +554,11 @@ void RSDK::Legacy::v3::LoadGameXML(bool pal)
                 PrintLog(PRINT_NORMAL, "[MOD] Failed to parse Game.xml file for mod %s", modList[m].id.c_str());
             }
 
-            delete[] xmlData;
+            delete[] fileBuffer;
             delete doc;
-
-            fClose(f);
         }
     }
+
     SetActiveMod(-1);
 }
 
