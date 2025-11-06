@@ -709,6 +709,7 @@ void RSDK::LoadMods(bool newOnly, bool32 getVersion)
     sprintf_s(modBuf, sizeof(modBuf), "%smods", SKU::userFileDir);
     std::string modPathStr = modBuf;
 
+    // First, get a list of all folders in the mods directory.
     std::vector<std::string> availableModFolders;
 #if !defined(__PS3__) && (!defined(__GNUC__) || __GNUC__ >= 8)
     fs::path modPath(modPathStr);
@@ -736,55 +737,69 @@ void RSDK::LoadMods(bool newOnly, bool32 getVersion)
     }
 #endif
 
-    std::vector<std::string> processedFolders;
+    // Now, load the mod configuration.
     string mod_config_path = modPathStr + "/modconfig.ini";
-    FileIO *configFile = fOpen(mod_config_path.c_str(), "r");
-    if (configFile) {
-        fClose(configFile);
-        auto ini = iniparser_load(mod_config_path.c_str());
-        if(ini) {
-            int32 c = iniparser_getsecnkeys(ini, "Mods");
+    auto ini = iniparser_load(mod_config_path.c_str());
+
+    std::vector<std::string> modsToLoad;
+    if (ini) {
+        int32 c = iniparser_getsecnkeys(ini, "Mods");
+        if (c > 0) {
             const char **keys = new const char *[c];
             iniparser_getseckeys(ini, "Mods", keys);
-
             for (int32 m = 0; m < c; ++m) {
-                std::string configFolderName = string(keys[m] + 5);
-                std::string realFolderName;
-                for(const auto& folder : availableModFolders) {
-                    if (strcasecmp(folder.c_str(), configFolderName.c_str()) == 0) {
-                        realFolderName = folder;
-                        break;
-                    }
-                }
-
-                if (!realFolderName.empty()) {
-                    ModInfo info  = {};
-                    bool32 active = iniparser_getboolean(ini, keys[m], false);
-                    if (LoadMod(&info, modPathStr, realFolderName, active, getVersion)) {
-                        modList.push_back(info);
-                        processedFolders.push_back(realFolderName);
-                    }
-                }
+                modsToLoad.push_back(string(keys[m] + 5));
             }
             delete[] keys;
-            iniparser_freedict(ini);
         }
     }
 
+    // Add any mods not in the config to the end of the list to be loaded.
     for (const auto& folder : availableModFolders) {
-        bool alreadyProcessed = false;
-        for (const auto& processed : processedFolders) {
-            if (folder == processed) {
-                alreadyProcessed = true;
+        bool found = false;
+        for (const auto& modName : modsToLoad) {
+            if (strcasecmp(folder.c_str(), modName.c_str()) == 0) {
+                found = true;
                 break;
             }
         }
-        if (!alreadyProcessed) {
-            ModInfo info = {};
-            if (LoadMod(&info, modPathStr, folder, false, getVersion)) {
-                modList.push_back(info);
+        if (!found) {
+            modsToLoad.push_back(folder);
+        }
+    }
+
+    for (const auto& modName : modsToLoad) {
+        std::string realFolderName;
+        for (const auto& folder : availableModFolders) {
+            if (strcasecmp(folder.c_str(), modName.c_str()) == 0) {
+                realFolderName = folder;
+                break;
             }
         }
+
+        if (!realFolderName.empty()) {
+            bool alreadyLoaded = false;
+            if (newOnly) {
+                for (const auto& loadedMod : modList) {
+                    if (strcasecmp(loadedMod.folderName.c_str(), realFolderName.c_str()) == 0) {
+                        alreadyLoaded = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!alreadyLoaded) {
+                ModInfo info  = {};
+                bool32 active = ini ? iniparser_getboolean(ini, ("Mods:" + modName).c_str(), false) : false;
+                if (LoadMod(&info, modPathStr, realFolderName, active, getVersion)) {
+                    modList.push_back(info);
+                }
+            }
+        }
+    }
+
+    if (ini) {
+        iniparser_freedict(ini);
     }
 
     RSDK::PrintLog(RSDK::PRINT_NORMAL, "[MOD_FLOW] LoadMods: All mod folder processing complete.");
