@@ -50,9 +50,9 @@ PKGFILES	:=	../pkgfiles
 ICON0		:=	$(PKGFILES)/ICON0.PNG
 SFOXML		:=	../sfo.xml
 
-TITLE		:=	Sonic Mania
-APPID		:=	SMAP02024
-CONTENTID	:=	UP0001-$(APPID)_00-SONICMANIAPS3000
+TITLE		:=	RSDKV5Universal
+APPID		:=	REVU00126
+CONTENTID	:=	UP0001-$(APPID)_00-RSDKV5UPS3000
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -103,7 +103,7 @@ EXTRA_OFLAGS = -falign-functions  -falign-jumps \
 -ftree-vrp \
 -fvect-cost-model=cheap
 
-RSDK_flags	=	-D__PS3__ -DRETRO_STANDALONE=0 -DRETRO_USE_MOD_LOADER=1 -DRETRO_DISABLE_LOG -DGAME_VERSION=5 -DPS3_CONSOLE_MODE
+RSDK_flags	=	-D__PS3__ -DRETRO_STANDALONE=0 -DRETRO_USE_MOD_LOADER=1 -DGAME_VERSION=5 -DPS3_CONSOLE_MODE
 CFLAGS		=	-g3 -O1 $(EXTRA_OFLAGS) -Wall -mcpu=cell $(MACHDEP) $(INCLUDE) $(RSDK_flags)
 CXXFLAGS	=	$(CFLAGS) -std=c++11
 
